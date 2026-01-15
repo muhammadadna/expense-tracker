@@ -57,9 +57,6 @@
                         <!-- Breakdown (Mini Cards) -->
                         <div
                             class="flex-1 border-t md:border-t-0 md:border-l border-border-light dark:border-border-dark pt-6 md:pt-0 md:pl-8">
-                            <h4
-                                class="text-sm font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider mb-4">
-                                Breakdown</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
                                 <div
                                     class="rounded-lg bg-red-50 dark:bg-red-900/10 p-4 border border-red-100 dark:border-red-900/20 flex flex-col justify-center">

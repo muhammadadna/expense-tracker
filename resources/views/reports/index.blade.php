@@ -10,7 +10,7 @@
                     <h1
                         class="text-3xl font-black leading-tight tracking-tight text-text-main-light dark:text-text-main-dark md:text-4xl">
                         Reports & Visualizations</h1>
-                    <p class="text-text-secondary-light dark:text-text-secondary-dark font-medium">Track your family's
+                    <p class="mt-2 text-text-sub-light dark:text-text-sub-dark text-base">Track your family's
                         financial health with real-time analytics.</p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -63,7 +63,7 @@
                 <!-- Total Spent -->
                 <div
                     class="flex flex-col gap-1 rounded-xl border border-border-light bg-card-light p-5 shadow-sm dark:border-border-dark dark:bg-card-dark transition-all hover:shadow-md">
-                    <p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Total Spent
+                    <p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Total Spent
                     </p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-2xl font-bold text-text-main-light dark:text-white">Rp
@@ -78,13 +78,13 @@
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">vs. last month</p>
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">vs. last month</p>
                 </div>
 
                 <!-- Daily Average -->
                 <div
                     class="flex flex-col gap-1 rounded-xl border border-border-light bg-card-light p-5 shadow-sm dark:border-border-dark dark:bg-card-dark transition-all hover:shadow-md">
-                    <p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Daily Average
+                    <p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Daily Average
                     </p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-2xl font-bold text-text-main-light dark:text-white">Rp
@@ -99,34 +99,34 @@
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">vs. last month</p>
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">vs. last month</p>
                 </div>
 
                 <!-- Transaction Count (Replaces Budget Remaining) -->
                 <div
                     class="flex flex-col gap-1 rounded-xl border border-border-light bg-card-light p-5 shadow-sm dark:border-border-dark dark:bg-card-dark transition-all hover:shadow-md">
-                    <p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Total
+                    <p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Total
                         Transactions</p>
                     <div class="flex items-baseline gap-2">
                         <p class="text-2xl font-bold text-text-main-light dark:text-white">
                             {{ $recentTransactions->total() }}
                         </p>
                     </div>
-                    <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">Transactions
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">Transactions
                         recorded</p>
                 </div>
 
                 <!-- Highest Category -->
                 <div
                     class="flex flex-col gap-1 rounded-xl border border-border-light bg-card-light p-5 shadow-sm dark:border-border-dark dark:bg-card-dark transition-all hover:shadow-md">
-                    <p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Highest
+                    <p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Highest
                         Category</p>
                     <div class="flex items-baseline gap-2">
                         <p class="truncate text-2xl font-bold text-text-main-light dark:text-white">
                             {{ $highestCategory->name ?? 'N/A' }}
                         </p>
                     </div>
-                    <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">
                         @if($highestCategory)
                             Rp {{ number_format($highestCategory->total, 0, ',', '.') }}
                         @else
@@ -144,7 +144,7 @@
                     <div class="mb-6 flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-bold text-text-main-light dark:text-white">Spending Trends</h3>
-                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Daily spending
+                            <p class="text-sm text-text-sub-light dark:text-text-sub-dark">Daily spending
                                 over current period</p>
                         </div>
                     </div>
@@ -158,7 +158,7 @@
                     class="col-span-1 flex flex-col rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark">
                     <div class="mb-6">
                         <h3 class="text-lg font-bold text-text-main-light dark:text-white">Monthly Breakdown</h3>
-                        <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Expenses by category
+                        <p class="text-sm text-text-sub-light dark:text-text-sub-dark ">Expenses by category
                         </p>
                     </div>
                     <div class="flex flex-1 flex-col items-center justify-center gap-6">
@@ -213,7 +213,7 @@
                                     <td class="p-4 font-medium text-text-main-light dark:text-white">
                                         {{ $transaction->note ?? '-' }}
                                     </td>
-                                    <td class="p-4 text-text-secondary-light dark:text-text-secondary-dark">
+                                    <td class="p-4 text-text-sub-light dark:text-text-sub-dark ">
                                         <div class="flex items-center gap-2">
                                             <div
                                                 class="size-6 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[10px] font-bold">

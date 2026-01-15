@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TransactionCreated;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class TransactionController extends Controller
             'note' => 'nullable|string|max:255',
         ]);
 
-        Transaction::create([
+        $transaction = Transaction::create([
             'user_id' => Auth::id(),
             'family_id' => Auth::user()->family_id,
             'category_id' => $request->category_id,
@@ -35,6 +36,9 @@ class TransactionController extends Controller
             'date' => $request->date,
             'note' => $request->note,
         ]);
+
+        // Dispatch event for Google Sheets sync
+        event(new TransactionCreated($transaction));
 
         return redirect()->route('dashboard')->with('success', 'Expense added successfully!');
     }
