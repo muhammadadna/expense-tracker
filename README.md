@@ -1,59 +1,261 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 💰 FamilyBudget - Family Expense Tracker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, collaborative expense tracking application built with Laravel. Track expenses together with your family members in real-time.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-12.x-red?logo=laravel)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-blue?logo=tailwindcss)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 👨‍👩‍👧‍👦 **Family Groups** - Create or join a family group with invite codes
+- 💳 **Expense Tracking** - Log daily expenses with categories and notes
+- 📊 **Reports & Analytics** - Visualize spending with charts and trends
+- 🌙 **Dark Mode** - Beautiful dark/light theme support
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 📤 **Google Sheets Backup** - Automatically sync transactions to Google Sheets
+- 🔐 **Secure Authentication** - User registration with email verification
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠️ Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Backend:** Laravel 12, PHP 8.2+
+- **Frontend:** Blade, TailwindCSS, Alpine.js
+- **Database:** SQLite (default) / MySQL / PostgreSQL
+- **Charts:** Chart.js
+- **Icons:** Material Symbols
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📦 Installation
 
-### Premium Partners
+### Prerequisites
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- PHP 8.2 or higher
+- Composer
+- Node.js 18+ and npm
+- SQLite / MySQL / PostgreSQL
 
-## Contributing
+### Step 1: Clone the Repository
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+git clone https://github.com/yourusername/expense-tracker.git
+cd expense-tracker
+```
 
-## Code of Conduct
+### Step 2: Install Dependencies
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Install PHP dependencies
+composer install
 
-## Security Vulnerabilities
+# Install Node.js dependencies
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Step 3: Environment Setup
 
-## License
+```bash
+# Copy the example environment file
+cp .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Generate application key
+php artisan key:generate
+```
+
+### Step 4: Database Setup
+
+```bash
+# Create SQLite database (default)
+touch database/database.sqlite
+
+# Run migrations
+php artisan migrate
+
+# Seed default categories
+php artisan db:seed
+```
+
+### Step 5: Build Assets
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm run build
+```
+
+### Step 6: Start the Server
+
+```bash
+php artisan serve
+```
+
+Visit `http://localhost:8000` in your browser.
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Edit `.env` file to configure:
+
+```env
+APP_NAME="FamilyBudget"
+APP_URL=http://localhost:8000
+
+# Database (SQLite is default)
+DB_CONNECTION=sqlite
+
+# For MySQL:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=expense_tracker
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# Google Sheets Integration (Optional)
+GOOGLE_SHEET_ID=your_spreadsheet_id_here
+```
+
+### Theme Customization
+
+Edit `tailwind.config.js` to change colors:
+
+```javascript
+colors: {
+    "primary": "#13ec80",           // Change primary color
+    "background-light": "#f6f8f7",  // Light mode background
+    "background-dark": "#102219",   // Dark mode background
+}
+```
+
+After changes, run: `npm run build`
+
+---
+
+## 📤 Google Sheets Integration (Optional)
+
+To enable automatic transaction backup to Google Sheets:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project and enable **Google Sheets API**
+3. Create a **Service Account** and download the JSON key
+4. Save the JSON file as `storage/app/google-credentials.json`
+5. Create a Google Spreadsheet with headers:
+   ```
+   ID | Date | Category | Amount | Note | User | Family | Created At
+   ```
+6. Share the spreadsheet with the service account email (Editor access)
+7. Add the Spreadsheet ID to `.env`:
+   ```
+   GOOGLE_SHEET_ID=your_spreadsheet_id
+   ```
+8. Test the connection:
+   ```bash
+   php artisan sheets:test
+   ```
+
+---
+
+## 🧪 Running Tests
+
+```bash
+# Run all tests
+php artisan test
+
+# Run with coverage
+php artisan test --coverage
+```
+
+---
+
+## 📁 Project Structure
+
+```
+├── app/
+│   ├── Http/Controllers/     # Application controllers
+│   ├── Models/               # Eloquent models
+│   ├── Events/               # Event classes
+│   ├── Listeners/            # Event listeners
+│   └── Services/             # Service classes (GoogleSheetsService)
+├── resources/
+│   ├── views/                # Blade templates
+│   │   ├── layouts/          # App layout & navigation
+│   │   ├── dashboard.blade.php
+│   │   ├── reports/          # Reports views
+│   │   ├── family/           # Family management views
+│   │   └── profile/          # Profile settings
+│   └── css/                  # Stylesheets
+├── routes/
+│   └── web.php               # Web routes
+├── database/
+│   ├── migrations/           # Database migrations
+│   └── seeders/              # Database seeders
+└── tailwind.config.js        # Tailwind CSS configuration
+```
+
+---
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Install Vercel CLI: `npm i -g vercel`
+2. Create `api/index.php` for serverless functions
+3. Configure `vercel.json` for Laravel routing
+4. Run: `vercel --prod`
+
+### Deploy to Traditional Hosting
+
+1. Upload files to server
+2. Set document root to `/public`
+3. Configure `.env` for production:
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   ```
+4. Run:
+   ```bash
+   composer install --optimize-autoloader --no-dev
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   npm run build
+   ```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+- [Laravel](https://laravel.com) - The PHP Framework
+- [TailwindCSS](https://tailwindcss.com) - Utility-first CSS
+- [Alpine.js](https://alpinejs.dev) - Lightweight JavaScript
+- [Chart.js](https://www.chartjs.org) - JavaScript charting
+- [Material Symbols](https://fonts.google.com/icons) - Google Icons
+
+---
+
+Made with ❤️ for families who want to track their finances together.

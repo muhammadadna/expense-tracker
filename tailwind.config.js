@@ -9,6 +9,8 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
+    darkMode: 'class',
+
     theme: {
         extend: {
             fontFamily: {
@@ -16,17 +18,23 @@ export default {
                 display: ['Manrope', 'sans-serif'],
             },
             colors: {
+                // Primary green color
                 "primary": "#13ec80",
+                "primary-dark": "#0fd671",
+
+                // Light mode - White background with green accents
                 "background-light": "#f6f8f7",
-                "background-dark": "#102219",
-                "card-light": "#ffffff",
-                "card-dark": "#1C2E24",
+                "card-light": "#ffffffff",
                 "border-light": "#dbe6e0",
-                "border-dark": "#2a3c32",
                 "text-main-light": "#111814",
+                "text-sub-light": "#5a6b5e",
+
+                // Dark mode - Keep as is (green-dark theme)
+                "background-dark": "#102219",
+                "card-dark": "#1C2E24",
+                "border-dark": "#2a3c32",
                 "text-main-dark": "#ffffff",
-                "text-sub-light": "#637588",
-                "text-sub-dark": "#9ca3af",
+                "text-sub-dark": "#9ab0a5",
             },
         },
     },
