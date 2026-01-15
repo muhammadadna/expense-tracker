@@ -1,4 +1,3 @@
 <?php
-
-// Forward Vercel requests to Laravel's public index.php
+ini_set('ffi.enable', '0');
 require __DIR__ . '/../public/index.php';
