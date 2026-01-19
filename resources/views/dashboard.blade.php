@@ -75,7 +75,7 @@
                                         <span class="text-xs font-bold uppercase">Categories</span>
                                     </div>
                                     <span
-                                        class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">8</span>
+                                        class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{{ $categoryActive }}</span>
                                     <span class="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Active</span>
                                 </div>
                             </div>

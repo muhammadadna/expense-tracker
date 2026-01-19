@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,8 +30,11 @@ class DashboardController extends Controller
             ->where('family_id', $user->family_id)
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->take(10)
+            // ->take(10)
             ->get();
+
+        //Category Active
+        $categoryActive = Category::count();
 
         // Chart Data (Daily breakdown for current month)
         $dailyExpenses = Transaction::where('family_id', $user->family_id)
@@ -43,6 +47,6 @@ class DashboardController extends Controller
         $chartLabels = $dailyExpenses->pluck('date')->map(fn($d) => Carbon::parse($d)->format('d M'));
         $chartData = $dailyExpenses->pluck('total');
 
-        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData'));
+        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData', 'categoryActive'));
     }
 }
