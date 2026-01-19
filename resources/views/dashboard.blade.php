@@ -65,7 +65,7 @@
                                         <span class="text-xs font-bold uppercase">Transactions</span>
                                     </div>
                                     <span
-                                        class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{{ $recentTransactions->count() }}</span>
+                                        class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{{ $totalTransactions }}</span>
                                     <span class="text-xs text-red-600/70 dark:text-red-400/70 mt-1">Recorded</span>
                                 </div>
                                 <div
@@ -125,6 +125,9 @@
                                 </div>
                             @endforelse
                         </div>
+                    </div>
+                    <div class="mt-4">
+                        {{ $recentTransactions->links() }}
                     </div>
                 </div>
             </div>

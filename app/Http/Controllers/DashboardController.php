@@ -30,9 +30,14 @@ class DashboardController extends Controller
             ->where('family_id', $user->family_id)
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
-            // ->take(10)
-            ->get();
+            ->paginate(10);
 
+        //Total Transactions
+        $totalTransactions = Transaction::with(['category', 'user'])
+            ->where('family_id', $user->family_id)
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->count();
         //Category Active
         $categoryActive = Category::count();
 
@@ -47,6 +52,6 @@ class DashboardController extends Controller
         $chartLabels = $dailyExpenses->pluck('date')->map(fn($d) => Carbon::parse($d)->format('d M'));
         $chartData = $dailyExpenses->pluck('total');
 
-        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData', 'categoryActive'));
+        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData', 'categoryActive', 'totalTransactions'));
     }
 }
