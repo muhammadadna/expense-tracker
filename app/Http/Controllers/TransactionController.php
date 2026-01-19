@@ -38,7 +38,7 @@ class TransactionController extends Controller
         ]);
 
         // Dispatch event for Google Sheets sync
-        // event(new TransactionCreated($transaction));
+        event(new TransactionCreated($transaction));
 
         return redirect()->route('dashboard')->with('success', 'Expense added successfully!');
     }
