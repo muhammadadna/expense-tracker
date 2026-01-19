@@ -145,15 +145,17 @@ After changes, run: `npm run build`
 To enable automatic transaction backup to Google Sheets:
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project and enable **Google Sheets API**
-3. Create a **Service Account** and download the JSON key
-4. Save the JSON file as `storage/app/google-credentials.json`
+2. Create a new project and enable **Google Sheets API**.
+3. Create a **Service Account** and download the JSON key.
+4. **Google Sheets Setup**
+   - **Local Dev**: Save the downloaded JSON key file as `storage/app/google-credentials.json`.
+   - **Production (e.g., Vercel)**: Copy the content of the JSON key file, remove newlines (minify it), and set it as the `GOOGLE_CREDENTIALS` environment variable in your hosting provider.
 5. Create a Google Spreadsheet with headers:
    ```
    ID | Date | Category | Amount | Note | User | Family | Created At
    ```
-6. Share the spreadsheet with the service account email (Editor access)
-7. Add the Spreadsheet ID to `.env`:
+6. Share the spreadsheet with the service account email (Editor access).
+7. Add the Spreadsheet ID to your `.env` file:
    ```
    GOOGLE_SHEET_ID=your_spreadsheet_id
    ```
