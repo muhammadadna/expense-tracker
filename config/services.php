@@ -37,6 +37,7 @@ return [
 
     'google' => [
         'sheet_id' => env('GOOGLE_SHEET_ID'),
+        'credentials' => env('GOOGLE_CREDENTIALS'),
     ],
 
 ];

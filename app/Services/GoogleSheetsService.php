@@ -16,7 +16,7 @@ class GoogleSheetsService
     public function __construct()
     {
         $this->spreadsheetId = config('services.google.sheet_id');
-        
+
         if ($this->isConfigured()) {
             $this->initializeClient();
         }
@@ -25,7 +25,9 @@ class GoogleSheetsService
     protected function isConfigured(): bool
     {
         $credentialsPath = storage_path('app/google-credentials.json');
-        return file_exists($credentialsPath) && !empty($this->spreadsheetId);
+        $envCredentials = config('services.google.credentials'); // We will add this to config/services.php
+
+        return (file_exists($credentialsPath) || !empty($envCredentials)) && !empty($this->spreadsheetId);
     }
 
     protected function initializeClient()
@@ -34,7 +36,21 @@ class GoogleSheetsService
             $this->client = new Client();
             $this->client->setApplicationName('Family Expense Tracker');
             $this->client->setScopes([Sheets::SPREADSHEETS]);
-            $this->client->setAuthConfig(storage_path('app/google-credentials.json'));
+
+            $envCredentials = config('services.google.credentials');
+
+            if (!empty($envCredentials)) {
+                $credentials = json_decode($envCredentials, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->client->setAuthConfig($credentials);
+                } else {
+                    Log::error('Invalid JSON in GOOGLE_CREDENTIALS environment variable.');
+                    throw new \Exception('Invalid JSON in GOOGLE_CREDENTIALS');
+                }
+            } else {
+                $this->client->setAuthConfig(storage_path('app/google-credentials.json'));
+            }
+
             $this->client->setAccessType('offline');
 
             $this->service = new Sheets($this->client);

@@ -24,18 +24,29 @@ class TestGoogleSheets extends Command
         }
         $this->info('✅ GOOGLE_SHEET_ID is set: ' . substr($sheetId, 0, 10) . '...');
 
-        // Check 2: Credentials file
+        // Check 2: Credentials
         $credentialsPath = storage_path('app/google-credentials.json');
-        if (!file_exists($credentialsPath)) {
-            $this->error('❌ google-credentials.json not found in storage/app/');
-            $this->line('   Download from Google Cloud Console and place it there.');
+        $envCredentials = config('services.google.credentials');
+        $credentials = null;
+
+        if (!empty($envCredentials)) {
+            $this->info('✅ GOOGLE_CREDENTIALS env var found');
+            $credentials = json_decode($envCredentials, true);
+        } elseif (file_exists($credentialsPath)) {
+            $this->info('✅ google-credentials.json found in storage/app/');
+            $credentials = json_decode(file_get_contents($credentialsPath), true);
+        } else {
+            $this->error('❌ Credentials not found (neither file nor env var)');
+            $this->line('   Download google-credentials.json to storage/app/ OR set GOOGLE_CREDENTIALS env var.');
             return 1;
         }
-        $this->info('✅ Credentials file exists');
 
         // Check 3: Parse credentials
         try {
-            $credentials = json_decode(file_get_contents($credentialsPath), true);
+            if (!$credentials) {
+                throw new \Exception('Credentials could not be parsed as JSON');
+            }
+
             $clientEmail = $credentials['client_email'] ?? null;
 
             if ($clientEmail) {
@@ -44,7 +55,7 @@ class TestGoogleSheets extends Command
                 $this->warn('⚠️  Make sure you shared the spreadsheet with this email!');
             }
         } catch (\Exception $e) {
-            $this->error('❌ Failed to parse credentials file: ' . $e->getMessage());
+            $this->error('❌ Failed to parse credentials: ' . $e->getMessage());
             return 1;
         }
 
