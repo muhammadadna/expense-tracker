@@ -69,14 +69,28 @@
                                     <span class="text-xs text-red-600/70 dark:text-red-400/70 mt-1">Recorded</span>
                                 </div>
                                 <div
-                                    class="rounded-lg bg-green-50 dark:bg-green-900/10 p-4 border border-green-100 dark:border-green-900/20 flex flex-col justify-center">
+                                    class="rounded-lg bg-green-50 dark:bg-green-900/10 p-4 border border-green-100 dark:border-green-900/20 flex flex-col justify-start">
                                     <div class="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
-                                        <span class="material-symbols-outlined text-2xl">savings</span>
-                                        <span class="text-xs font-bold uppercase">Categories</span>
+                                        <span class="material-symbols-outlined text-2xl">pie_chart</span>
+                                        <span class="text-xs font-bold uppercase">Monthly Breakdown</span>
                                     </div>
-                                    <span
-                                        class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{{ $categoryActive }}</span>
-                                    <span class="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Active</span>
+                                    <div class="flex flex-col gap-2 mt-1">
+                                        @forelse($monthlyBreakdown as $category)
+                                            <div class="flex items-center justify-between text-sm">
+                                                <div class="flex items-center gap-2">
+                                                    <x-icon name="{{ $category->icon }}"
+                                                        class="text-lg text-green-600 dark:text-green-400" />
+                                                    <span
+                                                        class="font-medium text-text-main-light dark:text-text-main-dark">{{ $category->name }}</span>
+                                                </div>
+                                                <span class="font-bold text-text-main-light dark:text-text-main-dark">Rp
+                                                    {{ number_format($category->total, 0, ',', '.') }}</span>
+                                            </div>
+                                        @empty
+                                            <span class="text-xs text-text-sub-light dark:text-text-sub-dark italic">No
+                                                data</span>
+                                        @endforelse
+                                    </div>
                                 </div>
                             </div>
                         </div>

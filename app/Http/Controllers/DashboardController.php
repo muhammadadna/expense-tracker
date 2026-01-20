@@ -38,8 +38,15 @@ class DashboardController extends Controller
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->count();
-        //Category Active
-        $categoryActive = Category::count();
+        // Monthly Breakdown (Top 3 Categories)
+        $monthlyBreakdown = Transaction::where('family_id', $user->family_id)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->select('categories.name', 'categories.icon', \Illuminate\Support\Facades\DB::raw('sum(amount) as total'))
+            ->groupBy('categories.name', 'categories.icon')
+            ->orderByDesc('total')
+            ->take(3)
+            ->get();
 
         // Chart Data (Daily breakdown for current month)
         $dailyExpenses = Transaction::where('family_id', $user->family_id)
@@ -52,6 +59,6 @@ class DashboardController extends Controller
         $chartLabels = $dailyExpenses->pluck('date')->map(fn($d) => Carbon::parse($d)->format('d M'));
         $chartData = $dailyExpenses->pluck('total');
 
-        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData', 'categoryActive', 'totalTransactions'));
+        return view('dashboard', compact('currentMonthTotal', 'recentTransactions', 'chartLabels', 'chartData', 'monthlyBreakdown', 'totalTransactions'));
     }
 }
