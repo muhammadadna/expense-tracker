@@ -18,10 +18,13 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
-        if ("{{ Auth::user()->theme ?? 'light' }}" === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        const userTheme = "{{ Auth::user()->theme ?? 'light' }}";
+        if (userTheme === 'dark') {
             document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
         } else {
             document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
         }
     </script>
 </head>
