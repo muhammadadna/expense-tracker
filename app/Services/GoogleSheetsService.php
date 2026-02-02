@@ -77,7 +77,7 @@ class GoogleSheetsService
                 $transaction->id,
                 $transaction->date->format('Y-m-d'),
                 $transaction->category->name ?? 'Unknown',
-                $transaction->amount,
+                (float) $transaction->amount,
                 $transaction->note ?? '',
                 $transaction->user->name ?? 'Unknown',
                 $transaction->family->name ?? 'Unknown',
