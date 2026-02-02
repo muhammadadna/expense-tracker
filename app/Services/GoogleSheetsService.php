@@ -67,6 +67,12 @@ class GoogleSheetsService
         }
 
         try {
+            // Determine sheet name based on transaction date
+            $sheetName = $transaction->date->format('F Y'); // e.g. "January 2026"
+
+            // Ensure the sheet exists
+            $this->ensureSheetExists($sheetName);
+
             $row = [
                 $transaction->id,
                 $transaction->date->format('Y-m-d'),
@@ -88,17 +94,75 @@ class GoogleSheetsService
 
             $this->service->spreadsheets_values->append(
                 $this->spreadsheetId,
-                'Sheet1!A:H',
+                $sheetName . '!A:H',
                 $body,
                 $params
             );
 
-            Log::info('Transaction #' . $transaction->id . ' synced to Google Sheets.');
+            Log::info('Transaction #' . $transaction->id . ' synced to Google Sheets (' . $sheetName . ').');
             return true;
 
         } catch (\Exception $e) {
             Log::error('Failed to sync transaction to Google Sheets: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    protected function ensureSheetExists(string $sheetName)
+    {
+        try {
+            // Get spreadsheet details
+            $spreadsheet = $this->service->spreadsheets->get($this->spreadsheetId);
+            $sheets = $spreadsheet->getSheets();
+
+            $exists = false;
+            foreach ($sheets as $sheet) {
+                if ($sheet->getProperties()->getTitle() === $sheetName) {
+                    $exists = true;
+                    break;
+                }
+            }
+
+            if (!$exists) {
+                // Resize sheet to have more columns? Default is usually enough for A:H (8 columns)
+
+                $batchUpdateRequest = new \Google\Service\Sheets\BatchUpdateSpreadsheetRequest([
+                    'requests' => [
+                        [
+                            'addSheet' => [
+                                'properties' => [
+                                    'title' => $sheetName
+                                ]
+                            ]
+                        ]
+                    ]
+                ]);
+
+                $this->service->spreadsheets->batchUpdate($this->spreadsheetId, $batchUpdateRequest);
+
+                // Add header row
+                $headers = ['ID', 'Date', 'Category', 'Amount', 'Note', 'User', 'Family', 'Created At'];
+                $body = new ValueRange([
+                    'values' => [$headers]
+                ]);
+                $params = [
+                    'valueInputOption' => 'USER_ENTERED'
+                ];
+
+                $this->service->spreadsheets_values->append(
+                    $this->spreadsheetId,
+                    $sheetName . '!A1',
+                    $body,
+                    $params
+                );
+
+                Log::info("Created new sheet: $sheetName");
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error checking/creating sheet '$sheetName': " . $e->getMessage());
+            // We might want to throw here or let the subsequent append fail
+            throw $e;
         }
     }
 }
