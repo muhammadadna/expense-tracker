@@ -20,6 +20,8 @@
                 href="{{ route('reports.index') }}">Reports</a>
             <a class="text-sm font-medium {{ request()->routeIs('family.show') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
                 href="{{ route('family.show') }}">Family</a>
+            <a class="text-sm font-medium {{ request()->routeIs('category.index') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
+                href="{{ route('category.index') }}">Category</a>
         </nav>
     </div>
 
@@ -109,6 +111,11 @@
                 class="flex items-center gap-3 p-3 rounded-lg {{ request()->routeIs('family.show') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark' }} transition-colors">
                 <span class="material-symbols-outlined">family_restroom</span>
                 <span class="font-medium">Family</span>
+            </a>
+            <a href="{{ route('category.index') }}"
+                class="flex items-center gap-3 p-3 rounded-lg {{ request()->routeIs('category.index') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark' }} transition-colors">
+                <span class="material-symbols-outlined">category</span>
+                <span class="font-medium">Category</span>
             </a>
             <a href="{{ route('transactions.create') }}"
                 class="flex items-center gap-3 p-3 rounded-lg text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark transition-colors">

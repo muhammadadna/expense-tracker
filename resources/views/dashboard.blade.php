@@ -115,7 +115,7 @@
                                     class="flex items-center justify-between rounded-xl p-4 bg-background-light/50 dark:bg-background-dark/30 hover:bg-background-light dark:hover:bg-background-dark/80 transition-all cursor-pointer group border border-transparent hover:border-border-light dark:hover:border-border-dark">
                                     <div class="flex items-center gap-4">
                                         <div
-                                            class="flex size-12 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                                            class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary-dark dark:text-primary">
                                             <x-icon name="{{ $transaction->category->icon }}" class="text-2xl" />
                                         </div>
                                         <div class="flex flex-col gap-0.5">
