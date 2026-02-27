@@ -94,6 +94,7 @@ class ReportController extends Controller
             ->orderByDesc('total')
             ->get();
 
+        $topCategories = $breakdownData->take(3);
         $breakdownLabels = $breakdownData->pluck('name');
         $breakdownValues = $breakdownData->pluck('total');
 
@@ -131,6 +132,7 @@ class ReportController extends Controller
             'chartData',
             'breakdownLabels',
             'breakdownValues',
+            'topCategories',
             'recentTransactions',
             'allCategories',
             'years',

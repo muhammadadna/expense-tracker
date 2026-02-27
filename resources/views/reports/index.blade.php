@@ -55,6 +55,12 @@
                         class="flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-bold text-background-dark hover:bg-primary-dark transition-colors">
                         Filter
                     </button>
+                    @if(request()->hasAny(['month', 'year', 'category_id']))
+                        <a href="{{ route('reports.index') }}"
+                            class="flex items-center justify-center rounded-lg border border-border-light bg-background-light px-4 py-2 text-sm font-bold text-text-main-light hover:bg-border-light transition-colors dark:border-border-dark dark:bg-background-dark dark:text-white dark:hover:bg-border-dark">
+                            Reset
+                        </a>
+                    @endif
                 </div>
             </form>
 
@@ -138,18 +144,51 @@
 
             <!-- Charts Section -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <!-- Line Chart -->
+                <!-- Top 3 Categories -->
                 <div
                     class="col-span-1 flex flex-col rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark lg:col-span-2">
-                    <div class="mb-6 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-bold text-text-main-light dark:text-white">Spending Trends</h3>
-                            <p class="text-sm text-text-sub-light dark:text-text-sub-dark">Daily spending
-                                over current period</p>
-                        </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-text-main-light dark:text-white">Top Spending Categories</h3>
+                        <p class="text-sm text-text-sub-light dark:text-text-sub-dark">Highest total expenses for this
+                            period</p>
                     </div>
-                    <div class="relative h-[300px] w-full">
-                        <canvas id="trendChart"></canvas>
+
+                    <div class="flex flex-col gap-6 justify-center flex-1">
+                        @forelse($topCategories as $index => $category)
+                            @php
+                                $percentage = $totalSpent > 0 ? ($category->total / $totalSpent) * 100 : 0;
+                            @endphp
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex size-10 items-center justify-center rounded-full font-bold shadow-sm {{ $index == 0 ? 'bg-[#13ec80] text-background-dark' : 'bg-background-light dark:bg-background-dark text-text-main-light dark:text-white border border-border-light dark:border-border-dark' }}">
+                                            #{{ $index + 1 }}
+                                        </div>
+                                        <span
+                                            class="font-bold text-text-main-light dark:text-white">{{ $category->name }}</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-text-main-light dark:text-white">
+                                            Rp {{ number_format($category->total, 0, ',', '.') }}
+                                        </div>
+                                        <div class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">
+                                            {{ number_format($percentage, 1) }}% of total
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="h-2.5 w-full overflow-hidden rounded-full bg-border-light dark:bg-border-dark">
+                                    <div class="h-full rounded-full transition-all duration-500 {{ $index == 0 ? 'bg-[#13ec80]' : ($index == 1 ? 'bg-[#2563eb]' : 'bg-[#f59e0b]') }}"
+                                        style="width: {{ $percentage }}%">
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div
+                                class="flex h-full min-h-[150px] items-center justify-center text-text-sub-light dark:text-text-sub-dark">
+                                No category data found for this period.
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -245,7 +284,7 @@
 
     <!-- Chart Config -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Colors
             const primaryColor = '#13ec80';
             const gridColor = document.documentElement.classList.contains('dark') ? '#2a4035' : '#dbe6e0';
@@ -256,73 +295,6 @@
             const chartData = @json($chartData);
             const breakdownLabels = @json($breakdownLabels);
             const breakdownValues = @json($breakdownValues);
-
-            // Debug log
-            console.log('Chart Labels:', chartLabels);
-            console.log('Chart Data:', chartData);
-
-            // Trend Chart
-            const trendCanvas = document.getElementById('trendChart');
-            if (trendCanvas) {
-                const ctxTrend = trendCanvas.getContext('2d');
-                new Chart(ctxTrend, {
-                    type: 'line',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Daily Spending (Rp)',
-                            data: chartData,
-                            borderColor: primaryColor,
-                            backgroundColor: 'rgba(19, 236, 128, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 4,
-                            pointBackgroundColor: primaryColor,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Rp ' + context.raw.toLocaleString('id-ID');
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-             grid: { display: false },
-                                ticks: { 
-                                    color: textColor,
-                                    maxTicksLimit: 7
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: gridColor },
-                                ticks: { 
-                                    color: textColor,
-                                    callback: function(value) {
-                                        return 'Rp ' + (value / 1000) + 'k';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
 
             // Breakdown Chart
             const breakdownCanvas = document.getElementById('breakdownChart');
@@ -350,7 +322,7 @@
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function (context) {
                                         return context.label + ': Rp ' + context.raw.toLocaleString('id-ID');
                                     }
                                 }
