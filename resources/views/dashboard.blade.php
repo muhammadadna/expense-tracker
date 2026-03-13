@@ -62,7 +62,7 @@
                                     class="rounded-lg bg-red-50 dark:bg-red-900/10 p-4 border border-red-100 dark:border-red-900/20 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
                                         <span class="material-symbols-outlined text-2xl">trending_down</span>
-                                        <span class="text-xs font-bold uppercase">Transactions</span>
+                                        <span class="text-xs font-bold uppercase">Monthly Transactions</span>
                                     </div>
                                     <span
                                         class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{{ $totalTransactions }}</span>

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -32,12 +30,12 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        //Total Transactions
+        //Monthly Transactions
         $totalTransactions = Transaction::with(['category', 'user'])
             ->where('family_id', $user->family_id)
-            ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc')
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
             ->count();
+
         // Monthly Breakdown (Top 3 Categories)
         $monthlyBreakdown = Transaction::where('family_id', $user->family_id)
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
