@@ -22,8 +22,17 @@ class ReportController extends Controller
         $categoryId = $request->input('category_id');
 
         // Date Range
-        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
-        $endDate = $startDate->copy()->endOfMonth();
+        if ($year === 'all') {
+            $firstTransaction = Transaction::where('family_id', $familyId)->orderBy('date', 'asc')->first();
+            $startDate = $firstTransaction ? Carbon::parse($firstTransaction->date)->startOfMonth() : now()->startOfYear();
+            $endDate = now()->endOfMonth();
+        } elseif ($month === 'all') {
+            $startDate = Carbon::createFromDate($year, 1, 1)->startOfYear();
+            $endDate = $startDate->copy()->endOfYear();
+        } else {
+            $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endDate = $startDate->copy()->endOfMonth();
+        }
 
         // Base Query
         $attributable = Transaction::where('family_id', $familyId)
@@ -37,24 +46,50 @@ class ReportController extends Controller
         $transactionsQuery = clone $attributable;
         $totalSpent = $attributable->sum('amount');
 
-        // Previous Period Comparison (Same month last year? Or prev month? Usually prev month)
-        // Let's do previous month for "vs last month"
-        $prevStartDate = $startDate->copy()->subMonth();
-        $prevEndDate = $prevStartDate->copy()->endOfMonth();
-        $prevTotal = Transaction::where('family_id', $familyId)
-            ->whereBetween('date', [$prevStartDate, $prevEndDate])
-            ->sum('amount');
+        // Previous Period Comparison
+        $prevTotal = 0;
+        $prevDays = 1;
+
+        if ($year === 'all') {
+            $vsText = 'all time';
+        } elseif ($month === 'all') {
+            $vsText = 'vs. last year';
+            $prevStartDate = $startDate->copy()->subYear();
+            $prevEndDate = $prevStartDate->copy()->endOfYear();
+            $prevTotal = Transaction::where('family_id', $familyId)
+                ->whereBetween('date', [$prevStartDate, $prevEndDate])
+                ->sum('amount');
+            $prevDays = $prevStartDate->isLeapYear() ? 366 : 365;
+        } else {
+            $vsText = 'vs. last month';
+            $prevStartDate = $startDate->copy()->subMonth();
+            $prevEndDate = $prevStartDate->copy()->endOfMonth();
+            $prevTotal = Transaction::where('family_id', $familyId)
+                ->whereBetween('date', [$prevStartDate, $prevEndDate])
+                ->sum('amount');
+            $prevDays = $prevStartDate->daysInMonth;
+        }
 
         $percentageChange = $prevTotal > 0 ? (($totalSpent - $prevTotal) / $prevTotal) * 100 : 0;
 
         // Daily Average
-        $daysPassed = $startDate->isCurrentMonth() ? now()->day : $startDate->daysInMonth;
-        $dailyAverage = $daysPassed > 0 ? $totalSpent / $daysPassed : 0;
+        if ($year === 'all') {
+            $daysPassed = max(1, $startDate->diffInDays(min(now(), $endDate)) + 1);
+            $dailyAverage = $totalSpent / $daysPassed;
+            $dailyAverageChange = 0;
+        } elseif ($month === 'all') {
+            $daysPassed = $startDate->isCurrentYear() ? max(1, now()->dayOfYear) : ($startDate->isLeapYear() ? 366 : 365);
+            $dailyAverage = $daysPassed > 0 ? $totalSpent / $daysPassed : 0;
 
-        // Prev Daily Average
-        $prevDaysInMonth = $prevStartDate->daysInMonth; // Full month for previous
-        $prevDailyAverage = $prevTotal / $prevDaysInMonth;
-        $dailyAverageChange = $prevDailyAverage > 0 ? (($dailyAverage - $prevDailyAverage) / $prevDailyAverage) * 100 : 0;
+            $prevDailyAverage = $prevTotal / max(1, $prevDays);
+            $dailyAverageChange = $prevDailyAverage > 0 ? (($dailyAverage - $prevDailyAverage) / $prevDailyAverage) * 100 : 0;
+        } else {
+            $daysPassed = $startDate->isCurrentMonth() ? max(1, now()->day) : $startDate->daysInMonth;
+            $dailyAverage = $daysPassed > 0 ? $totalSpent / $daysPassed : 0;
+
+            $prevDailyAverage = $prevTotal / max(1, $prevDays);
+            $dailyAverageChange = $prevDailyAverage > 0 ? (($dailyAverage - $prevDailyAverage) / $prevDailyAverage) * 100 : 0;
+        }
 
         // Highest Category
         $highestCategory = Transaction::where('family_id', $familyId)
@@ -76,13 +111,29 @@ class ReportController extends Controller
         // Fill missing dates for smooth chart
         $chartLabels = [];
         $chartData = [];
-        $tempDate = $startDate->copy();
-        while ($tempDate <= $endDate) {
-            $dateStr = $tempDate->format('Y-m-d');
-            $dayData = $trendsData->firstWhere('date', $dateStr);
-            $chartLabels[] = $tempDate->format('M d');
-            $chartData[] = $dayData ? $dayData->total : 0;
-            $tempDate->addDay();
+        
+        if ($year === 'all' || $month === 'all') {
+            $tempDate = $startDate->copy()->startOfMonth();
+            while ($tempDate <= $endDate->copy()->startOfMonth()) {
+                $monthStr = $tempDate->format('Y-m');
+                // sum the totals for all days in this month
+                $monthTotal = $trendsData->filter(function ($item) use ($monthStr) {
+                    return Carbon::parse($item->date)->format('Y-m') === $monthStr;
+                })->sum('total');
+                
+                $chartLabels[] = $tempDate->format('M Y');
+                $chartData[] = $monthTotal;
+                $tempDate->addMonth();
+            }
+        } else {
+            $tempDate = $startDate->copy();
+            while ($tempDate <= $endDate) {
+                $dateStr = $tempDate->format('Y-m-d');
+                $dayData = $trendsData->firstWhere('date', $dateStr);
+                $chartLabels[] = $tempDate->format('M d');
+                $chartData[] = $dayData ? $dayData->total : 0;
+                $tempDate->addDay();
+            }
         }
 
         // Monthly Breakdown (Group by Category)
@@ -139,7 +190,8 @@ class ReportController extends Controller
             'months',
             'month',
             'year',
-            'categoryId'
+            'categoryId',
+            'vsText'
         ));
     }
 }

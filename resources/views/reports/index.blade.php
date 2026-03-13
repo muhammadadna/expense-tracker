@@ -29,14 +29,16 @@
                     <span class="text-sm font-bold text-text-main-light dark:text-white">Period:</span>
                     <select name="month"
                         class="rounded-lg border-border-light bg-background-light text-sm font-medium text-text-main-light focus:border-primary focus:ring-primary dark:border-border-dark dark:bg-background-dark dark:text-white">
+                        <option value="all" {{ $month === 'all' ? 'selected' : '' }}>All Months</option>
                         @foreach($months as $num => $name)
-                            <option value="{{ $num }}" {{ $num == $month ? 'selected' : '' }}>{{ $name }}</option>
+                            <option value="{{ $num }}" {{ (string)$num === (string)$month && $month !== 'all' ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
                     <select name="year"
                         class="rounded-lg border-border-light bg-background-light text-sm font-medium text-text-main-light focus:border-primary focus:ring-primary dark:border-border-dark dark:bg-background-dark dark:text-white">
+                        <option value="all" {{ $year === 'all' ? 'selected' : '' }}>All Time</option>
                         @foreach($years as $y)
-                            <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
+                            <option value="{{ $y }}" {{ (string)$y === (string)$year && $year !== 'all' ? 'selected' : '' }}>{{ $y }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -84,7 +86,7 @@
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">vs. last month</p>
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">{{ $vsText }}</p>
                 </div>
 
                 <!-- Daily Average -->
@@ -105,7 +107,7 @@
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">vs. last month</p>
+                    <p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">{{ $vsText }}</p>
                 </div>
 
                 <!-- Transaction Count (Replaces Budget Remaining) -->
