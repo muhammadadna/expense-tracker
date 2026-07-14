@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\FamilyController;
+use App\Http\Controllers\MonthlySummaryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\EnsureUserHasFamily;
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware([EnsureUserHasFamily::class])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/monthly-summary', [MonthlySummaryController::class, 'index'])->name('monthly-summary.index');
         Route::get('/family/settings', [FamilyController::class, 'show'])->name('family.show');
 
         Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
