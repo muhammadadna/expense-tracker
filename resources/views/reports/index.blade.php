@@ -146,16 +146,75 @@
 
             <!-- Charts Section -->
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div
+                    class="col-span-1 flex flex-col rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-text-main-light dark:text-white">Highest Expense</h3>
+                        <p class="text-sm text-text-sub-light dark:text-text-sub-dark">Single biggest transaction this period</p>
+                    </div>
+                    @if($highestExpend)
+                        <div class="flex flex-col flex-1 justify-center">
+                            <!-- Amount -->
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="flex size-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
+                                    <span class="material-symbols-outlined text-red-500 dark:text-red-400 text-2xl">local_fire_department</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Amount</p>
+                                    <p class="text-2xl font-black text-text-main-light dark:text-white tracking-tight">Rp {{ number_format($highestExpend->amount, 0, ',', '.') }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="flex flex-col gap-3 border-t border-border-light dark:border-border-dark pt-4">
+                                <!-- Category -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-[16px]">category</span>
+                                        Category
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary-dark dark:text-primary">
+                                        {{ $highestExpend->category->name ?? 'Uncategorized' }}
+                                    </span>
+                                </div>
+                                <!-- Date -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                        Date
+                                    </span>
+                                    <span class="text-xs font-bold text-text-main-light dark:text-white">
+                                        {{ \Carbon\Carbon::parse($highestExpend->date)->format('M d, Y') }}
+                                    </span>
+                                </div>
+                                <!-- Note -->
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark flex items-center gap-1.5 shrink-0">
+                                        <span class="material-symbols-outlined text-[16px]">description</span>
+                                        Note
+                                    </span>
+                                    <span class="text-xs font-medium text-text-main-light dark:text-white text-right leading-relaxed">
+                                        {{ $highestExpend->note ?? 'No description' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="flex h-full min-h-[150px] items-center justify-center text-text-sub-light dark:text-text-sub-dark">
+                            No expense data found for this period.
+                        </div>
+                    @endif
+                </div>
                 <!-- Top 3 Categories -->
                 <div
-                    class="col-span-1 flex flex-col rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark lg:col-span-2">
+                    class="col-span-1 flex flex-col rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark">
                     <div class="mb-6">
                         <h3 class="text-lg font-bold text-text-main-light dark:text-white">Top Spending Categories</h3>
                         <p class="text-sm text-text-sub-light dark:text-text-sub-dark">Highest total expenses for this
                             period</p>
                     </div>
 
-                    <div class="flex flex-col gap-6 justify-center flex-1">
+                    <div class="flex flex-col gap-5 justify-center flex-1">
                         @forelse($topCategories as $index => $category)
                             @php
                                 $percentage = $totalSpent > 0 ? ($category->total / $totalSpent) * 100 : 0;
@@ -164,22 +223,22 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="flex size-10 items-center justify-center rounded-full font-bold shadow-sm {{ $index == 0 ? 'bg-[#13ec80] text-background-dark' : 'bg-background-light dark:bg-background-dark text-text-main-light dark:text-white border border-border-light dark:border-border-dark' }}">
+                                            class="flex size-9 items-center justify-center rounded-full text-sm font-bold shadow-sm {{ $index == 0 ? 'bg-[#13ec80] text-background-dark' : 'bg-background-light dark:bg-background-dark text-text-main-light dark:text-white border border-border-light dark:border-border-dark' }}">
                                             #{{ $index + 1 }}
                                         </div>
                                         <span
-                                            class="font-bold text-text-main-light dark:text-white">{{ $category->name }}</span>
+                                            class="font-bold text-sm text-text-main-light dark:text-white">{{ $category->name }}</span>
                                     </div>
                                     <div class="text-right">
-                                        <div class="font-bold text-text-main-light dark:text-white">
+                                        <div class="font-bold text-sm text-text-main-light dark:text-white">
                                             Rp {{ number_format($category->total, 0, ',', '.') }}
                                         </div>
                                         <div class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">
-                                            {{ number_format($percentage, 1) }}% of total
+                                            {{ number_format($percentage, 1) }}%
                                         </div>
                                     </div>
                                 </div>
-                                <div class="h-2.5 w-full overflow-hidden rounded-full bg-border-light dark:bg-border-dark">
+                                <div class="h-2 w-full overflow-hidden rounded-full bg-border-light dark:bg-border-dark">
                                     <div class="h-full rounded-full transition-all duration-500 {{ $index == 0 ? 'bg-[#13ec80]' : ($index == 1 ? 'bg-[#2563eb]' : 'bg-[#f59e0b]') }}"
                                         style="width: {{ $percentage }}%">
                                     </div>
@@ -203,11 +262,14 @@
                         </p>
                     </div>
                     <div class="flex flex-1 flex-col items-center justify-center gap-6">
-                        <div class="relative size-60">
+                        <div class="relative size-52">
                             <canvas id="breakdownChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Highest Expense -->
+                
             </div>
 
             <!-- Transactions Table -->

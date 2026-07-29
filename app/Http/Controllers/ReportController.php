@@ -149,6 +149,13 @@ class ReportController extends Controller
         $breakdownLabels = $breakdownData->pluck('name');
         $breakdownValues = $breakdownData->pluck('total');
 
+        // Highest Single Expense
+        $highestExpend = Transaction::where('family_id', $familyId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with('category')
+            ->orderByDesc('amount')
+            ->first();
+
         // Recent Transactions Table (Filtered)
         $recentTransactions = $transactionsQuery->with(['user', 'category'])
             ->orderBy('date', 'desc')
@@ -184,6 +191,7 @@ class ReportController extends Controller
             'breakdownLabels',
             'breakdownValues',
             'topCategories',
+            'highestExpend',
             'recentTransactions',
             'allCategories',
             'years',
