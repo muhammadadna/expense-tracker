@@ -35,8 +35,13 @@ class MonthlySummaryController extends Controller
         // Determine DB Driver to use universal month/year functions
         $driver = DB::connection()->getDriverName();
         $isPgSql = $driver === 'pgsql';
-        $monthSql = $isPgSql ? 'EXTRACT(MONTH FROM date)' : 'MONTH(date)';
-        $yearSql = $isPgSql ? 'EXTRACT(YEAR FROM date)' : 'YEAR(date)';
+        $isSqlite = $driver === 'sqlite';
+        $monthSql = $isPgSql
+            ? 'EXTRACT(MONTH FROM date)'
+            : ($isSqlite ? "CAST(strftime('%m', date) AS INTEGER)" : 'MONTH(date)');
+        $yearSql = $isPgSql
+            ? 'EXTRACT(YEAR FROM date)'
+            : ($isSqlite ? "CAST(strftime('%Y', date) AS INTEGER)" : 'YEAR(date)');
 
         // Build base query for the selected year
         $startDate = Carbon::createFromDate($selectedYear, 1, 1)->startOfYear();
@@ -92,6 +97,27 @@ class MonthlySummaryController extends Controller
                 return $group->first(); // Get the top category for each month
             });
 
+        // Get top transaction per month (highest single transaction amount)
+        $topTransactionPerMonth = Transaction::where('family_id', $familyId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->select(
+                DB::raw("{$monthSql} as month"),
+                'note as transaction_note',
+                'amount as transaction_amount'
+            )
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $q->where('transactions.category_id', $categoryId);
+            })
+            ->orderBy(DB::raw($monthSql))
+            ->orderByDesc('amount')
+            ->get()
+            ->groupBy(function ($item) {
+                return (int) $item->month;
+            })
+            ->map(function ($group) {
+                return $group->first();
+            });
+
         // Build month cards data
         $monthNames = [
             1 => 'January',
@@ -133,8 +159,9 @@ class MonthlySummaryController extends Controller
             $total = $data ? (float) $data->total : 0;
             $count = $data ? (int) $data->transaction_count : 0;
 
-            // Get top category for this month
+            // Get top category and top transaction for this month
             $topCategory = $topCategoryPerMonth->get($m);
+            $topTransaction = $topTransactionPerMonth->get($m);
 
             $monthCards[] = [
                 'month_number' => $m,
@@ -146,6 +173,8 @@ class MonthlySummaryController extends Controller
                 'top_category_name' => $topCategory ? $topCategory->category_name : null,
                 'top_category_icon' => $topCategory ? $topCategory->category_icon : null,
                 'top_category_total' => $topCategory ? (float) $topCategory->category_total : 0,
+                'top_transaction_note' => $topTransaction ? $topTransaction->transaction_note : null,
+                'top_transaction_total' => $topTransaction ? (float) $topTransaction->transaction_amount : 0,
             ];
 
             $grandTotal += $total;

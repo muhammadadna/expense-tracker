@@ -160,6 +160,20 @@
                                         Rp {{ number_format($card['top_category_total'], 0, ',', '.') }}
                                     </span>
                                 </div>
+                                <div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark border-b border-border-light dark:border-border-dark pb-2">
+                                    <div class="flex items-center gap-1 min-w-0">
+                                        @if($card['top_transaction_note'])
+                                            <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                                            <span class="truncate">Top Transaction: <span class="text-text-main-light dark:text-white font-medium">{{ $card['top_transaction_note'] }}</span></span>
+                                        @else
+                                            <span class="material-symbols-outlined text-[14px]">info</span>
+                                            <span>Top Transaction: <span class="text-text-main-light dark:text-white font-medium italic">None</span></span>
+                                        @endif
+                                    </div>
+                                    <span class="font-bold text-text-main-light dark:text-white whitespace-nowrap">
+                                        Rp {{ number_format($card['top_transaction_total'], 0, ',', '.') }}
+                                    </span>
+                                </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs text-text-sub-light dark:text-text-sub-dark">{{ $card['transaction_count'] }} transactions</span>
                                     <span class="bg-[#13ec80]/30 text-primary dark:text-[#13ec80] px-2 py-0.5 rounded text-xs font-bold">In Progress</span>
@@ -203,6 +217,20 @@
                                     </div>
                                     <span class="font-bold text-text-main-light dark:text-text-main-dark">
                                         Rp {{ number_format($card['top_category_total'], 0, ',', '.') }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark border-b border-border-light dark:border-border-dark pb-2">
+                                    <div class="flex items-center gap-1 min-w-0">
+                                        @if($card['top_transaction_note'])
+                                            <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                                            <span class="truncate">Top Transaction: <span class="text-text-main-light dark:text-text-main-dark font-medium">{{ $card['top_transaction_note'] }}</span></span>
+                                        @else
+                                            <span class="material-symbols-outlined text-[14px]">info</span>
+                                            <span>Top Transaction: <span class="text-text-main-light dark:text-text-main-dark font-medium italic">None</span></span>
+                                        @endif
+                                    </div>
+                                    <span class="font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">
+                                        Rp {{ number_format($card['top_transaction_total'], 0, ',', '.') }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center">

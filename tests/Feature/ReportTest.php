@@ -46,4 +46,36 @@ class ReportTest extends TestCase
         $response->assertViewHas('totalSpent', 100000);
         $response->assertSee('Rp 100.000');
     }
+
+    public function test_monthly_summary_page_shows_top_transaction_details()
+    {
+        $family = Family::create(['name' => 'Fam', 'family_code' => 'CODE']);
+        $user = User::factory()->create(['family_id' => $family->id]);
+        $category = Category::create(['name' => 'Food', 'icon' => 'food', 'is_priority' => true]);
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'family_id' => $family->id,
+            'category_id' => $category->id,
+            'amount' => 150000,
+            'date' => now()->startOfMonth(),
+            'note' => 'Groceries'
+        ]);
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'family_id' => $family->id,
+            'category_id' => $category->id,
+            'amount' => 250000,
+            'date' => now()->startOfMonth(),
+            'note' => 'Rent Payment'
+        ]);
+
+        $response = $this->actingAs($user)->get(route('monthly-summary.index', ['year' => now()->year]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Top Transaction');
+        $response->assertSee('Rent Payment');
+        $response->assertSee('Rp 250.000');
+    }
 }
