@@ -20,6 +20,8 @@
                 href="{{ route('reports.index') }}">Reports</a>
             <a class="text-sm font-medium {{ request()->routeIs('monthly-summary.index') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
                 href="{{ route('monthly-summary.index') }}">Summary</a>
+            <a class="text-sm font-medium {{ request()->routeIs('goals.*') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
+                href="{{ route('goals.index') }}">Goals</a>
             <a class="text-sm font-medium {{ request()->routeIs('family.show') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
                 href="{{ route('family.show') }}">Family</a>
             <a class="text-sm font-medium {{ request()->routeIs('category.index') ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark hover:text-primary' }} transition-colors"
@@ -113,6 +115,11 @@
                 class="flex items-center gap-3 p-3 rounded-lg {{ request()->routeIs('monthly-summary.index') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark' }} transition-colors">
                 <span class="material-symbols-outlined">calendar_month</span>
                 <span class="font-medium">Summary</span>
+            </a>
+            <a href="{{ route('goals.index') }}"
+                class="flex items-center gap-3 p-3 rounded-lg {{ request()->routeIs('goals.*') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark' }} transition-colors">
+                <span class="material-symbols-outlined">savings</span>
+                <span class="font-medium">Goals</span>
             </a>
             <a href="{{ route('family.show') }}"
                 class="flex items-center gap-3 p-3 rounded-lg {{ request()->routeIs('family.show') ? 'bg-primary/10 text-primary' : 'text-text-main-light dark:text-text-main-dark hover:bg-background-light dark:hover:bg-background-dark' }} transition-colors">

@@ -9,6 +9,7 @@ use App\Http\Controllers\FamilyController;
 use App\Http\Controllers\MonthlySummaryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\GoalController;
 use App\Http\Middleware\EnsureUserHasFamily;
 
 Route::get('/', function () {
@@ -40,6 +41,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
         Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
         Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.delete');
+
+        // Monthly Balancing & Goals Tracker
+        Route::get('/goals', [GoalController::class, 'index'])->name('goals.index');
+        Route::get('/goals/create', [GoalController::class, 'create'])->name('goals.create');
+        Route::post('/goals', [GoalController::class, 'store'])->name('goals.store');
+        Route::get('/goals/{id}', [GoalController::class, 'show'])->name('goals.show');
+        Route::get('/goals/{id}/edit', [GoalController::class, 'edit'])->name('goals.edit');
+        Route::put('/goals/{id}', [GoalController::class, 'update'])->name('goals.update');
+        Route::delete('/goals/{id}', [GoalController::class, 'destroy'])->name('goals.destroy');
+        Route::post('/goals/{id}/adjust', [GoalController::class, 'adjust'])->name('goals.adjust');
     });
 });
 
