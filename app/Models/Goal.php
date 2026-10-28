@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Database\Query\Expression;
 use Carbon\Carbon;
 
 class Goal extends Model
@@ -101,5 +103,26 @@ class Goal extends Model
         }
 
         return (float) $this->current_balance >= (float) $this->target_amount;
+    }
+
+    public function setHasTargetAttribute($value): void
+    {
+        if ($value instanceof Expression) {
+            $this->attributes['has_target'] = $value;
+            return;
+        }
+
+        $bool = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        $this->attributes['has_target'] = DB::raw($bool ? 'true' : 'false');
+    }
+
+    public function getHasTargetAttribute($value): bool
+    {
+        if ($value instanceof Expression) {
+            $val = (string) $value->getValue(DB::connection()->getQueryGrammar());
+            return $val === 'true' || $val === '1' || $val === 1;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 }

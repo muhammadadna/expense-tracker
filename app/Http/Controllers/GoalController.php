@@ -101,7 +101,7 @@ class GoalController extends Controller
                     'user_id' => $user->id,
                     'family_id' => $user->family_id,
                     'name' => trim($validated['name']),
-                    'has_target' => $hasTarget,
+                    'has_target' => DB::raw($hasTarget ? 'true' : 'false'),
                     'target_amount' => $targetAmount,
                     'target_date' => $targetDate,
                     'current_balance' => $initialBalance,
@@ -198,7 +198,7 @@ class GoalController extends Controller
         try {
             $goal->update([
                 'name' => trim($validated['name']),
-                'has_target' => $hasTarget,
+                'has_target' => DB::raw($hasTarget ? 'true' : 'false'),
                 'target_amount' => $targetAmount,
                 'target_date' => $targetDate,
                 'color' => !empty($validated['color']) ? trim($validated['color']) : $goal->color,
