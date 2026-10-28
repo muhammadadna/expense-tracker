@@ -297,6 +297,9 @@
                                 <th
                                     class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark">
                                     Amount</th>
+                                <th
+                                    class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark text-right">
+                                    Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border-light dark:divide-border-dark text-sm">
@@ -328,10 +331,28 @@
                                     <td class="p-4 font-bold text-text-main-light dark:text-white">- Rp
                                         {{ number_format($transaction->amount, 0, ',', '.') }}
                                     </td>
+                                    <td class="p-4 text-right">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <a href="{{ route('transactions.edit', $transaction->id) }}" 
+                                                title="Edit"
+                                                class="inline-flex items-center justify-center size-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary-dark dark:text-primary transition-colors">
+                                                <x-icon name="edit" class="text-[18px]" />
+                                            </a>
+                                            <form method="POST" action="{{ route('transactions.destroy', $transaction->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengeluaran ini?');" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                    title="Hapus"
+                                                    class="inline-flex items-center justify-center size-8 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-colors cursor-pointer">
+                                                    <x-icon name="delete" class="text-[18px]" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="p-4 text-center text-text-secondary-light">No transactions found
+                                    <td colspan="6" class="p-4 text-center text-text-secondary-light">No transactions found
                                         for this period.</td>
                                 </tr>
                             @endforelse

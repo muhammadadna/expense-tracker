@@ -112,14 +112,8 @@
                         <div class="flex flex-col gap-3">
                             @forelse($recentTransactions as $transaction)
                                 <div
-                                    class="flex items-center justify-between rounded-xl p-4 bg-background-light/50 dark:bg-background-dark/30 hover:bg-background-light dark:hover:bg-background-dark/80 transition-all cursor-pointer group border border-transparent hover:border-border-light dark:hover:border-border-dark">
+                                    class="flex items-center justify-between rounded-xl p-4 bg-background-light/50 dark:bg-background-dark/30 hover:bg-background-light dark:hover:bg-background-dark/80 transition-all group border border-transparent hover:border-border-light dark:hover:border-border-dark">
                                     <div class="flex items-center gap-4">
-                                        <div>
-                                            <a href="/transactions/{{ $transaction->id }}/edit" 
-                                                class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary-dark dark:text-primary">
-                                                <x-icon name="edit" class="text-[20px] md:text-[18px]" />
-                                            </a>
-                                        </div>
                                         <div
                                             class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary-dark dark:text-primary">
                                             <x-icon name="{{ $transaction->category->icon }}" class="text-2xl" />
@@ -136,8 +130,26 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <span class="text-base font-bold text-text-main-light dark:text-text-main-dark">- Rp
-                                        {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-base font-bold text-text-main-light dark:text-text-main-dark">- Rp
+                                            {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                                        <div class="flex items-center gap-1">
+                                            <a href="{{ route('transactions.edit', $transaction->id) }}" 
+                                                title="Edit"
+                                                class="inline-flex items-center justify-center size-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary-dark dark:text-primary transition-colors">
+                                                <x-icon name="edit" class="text-[18px]" />
+                                            </a>
+                                            <form method="POST" action="{{ route('transactions.destroy', $transaction->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengeluaran ini?');" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                    title="Hapus"
+                                                    class="inline-flex items-center justify-center size-8 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-colors cursor-pointer">
+                                                    <x-icon name="delete" class="text-[18px]" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             @empty
                                 <div class="text-center py-10 text-text-sub-light dark:text-text-sub-dark">

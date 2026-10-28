@@ -91,9 +91,16 @@ npm run build
 
 ### Step 6: Start the Server
 
+**Using Local PHP:**
 ```bash
 php artisan serve
 ```
+
+**Using Docker (PHP 8.5):**
+```bash
+docker compose up -d
+```
+*Lihat panduan lengkap Docker di [DOCKER_GUIDE.md](DOCKER_GUIDE.md).*
 
 Visit `http://localhost:8000` in your browser.
 

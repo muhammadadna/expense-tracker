@@ -120,17 +120,30 @@
                     </div>
 
                     <!-- Section 3: Actions -->
-                    <div class="mt-10 flex flex-col-reverse sm:flex-row items-center justify-end gap-4">
-                        <a href="{{ route('dashboard') }}"
-                            class="w-full text-center sm:w-auto text-[#618975] dark:text-gray-400 text-sm font-bold leading-normal hover:text-[#111814] dark:hover:text-white px-6 py-3 transition-colors">
-                            Batal
-                        </a>
-                        <button type="submit"
-                            class="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary text-[#102219] px-8 py-3.5 text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0fd973] transition-colors shadow-sm">
-                            <span class="material-symbols-outlined text-[20px]">save</span>
-                            Simpan Pengeluaran
+                    <div class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button type="button" onclick="if(confirm('Apakah Anda yakin ingin menghapus pengeluaran ini? Tindakan ini tidak dapat dibatalkan.')) { document.getElementById('delete-transaction-form').submit(); }"
+                            class="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-6 py-3.5 text-sm font-bold leading-normal hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors cursor-pointer">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                            Hapus Pengeluaran
                         </button>
+
+                        <div class="flex flex-col-reverse sm:flex-row items-center gap-4 w-full sm:w-auto">
+                            <a href="{{ route('dashboard') }}"
+                                class="w-full text-center sm:w-auto text-[#618975] dark:text-gray-400 text-sm font-bold leading-normal hover:text-[#111814] dark:hover:text-white px-6 py-3 transition-colors">
+                                Batal
+                            </a>
+                            <button type="submit"
+                                class="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary text-[#102219] px-8 py-3.5 text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0fd973] transition-colors shadow-sm cursor-pointer">
+                                <span class="material-symbols-outlined text-[20px]">save</span>
+                                Simpan Pengeluaran
+                            </button>
+                        </div>
                     </div>
+                </form>
+
+                <form id="delete-transaction-form" method="POST" action="{{ route('transactions.destroy', $transaction->id) }}" class="hidden">
+                    @csrf
+                    @method('DELETE')
                 </form>
             </div>
         </div>

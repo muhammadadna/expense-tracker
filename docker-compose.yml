@@ -1,0 +1,17 @@
+services:
+  app:
+    image: webdevops/php-apache-dev:8.5-alpine
+    container_name: expense-tracker-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/app
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - APPLICATION_UID=1000
+      - APPLICATION_GID=1000
+      - PHP_DATE_TIMEZONE=Asia/Jakarta
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /app
