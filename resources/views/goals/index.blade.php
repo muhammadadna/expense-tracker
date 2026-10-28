@@ -76,6 +76,23 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-600 dark:text-rose-400 flex items-center justify-between shadow-sm"
+                     x-data="{ show: true }" x-show="show" x-transition>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-xl">error</span>
+                        <ul class="text-sm font-semibold list-disc pl-4 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button @click="show = false" class="text-rose-600/70 hover:text-rose-600 cursor-pointer">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
+            @endif
+
             {{-- ===================================================================== --}}
             {{-- MONTHLY BALANCING HEADER STRIP (Preserved: Set @if(true) to reactivate) --}}
             {{-- ===================================================================== --}}

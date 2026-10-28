@@ -7,6 +7,9 @@ use App\Models\GoalTransaction;
 use App\Services\GoalBalancingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class GoalController extends Controller
 {
@@ -63,6 +66,10 @@ class GoalController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user->family_id) {
+            return redirect()->route('family.index')->with('error', 'Please create or join a family first.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'has_target' => 'required|in:0,1,true,false',
@@ -78,38 +85,64 @@ class GoalController extends Controller
         $hasTarget = filter_var($validated['has_target'], FILTER_VALIDATE_BOOLEAN);
         $initialBalance = (float) ($validated['initial_amount'] ?? 0);
         $note = !empty($validated['initial_note']) ? trim($validated['initial_note']) : ($initialBalance > 0 ? 'Initial Balance' : null);
+        $targetDate = ($hasTarget && !empty($validated['target_date']))
+            ? Carbon::parse($validated['target_date'])->format('Y-m-d')
+            : null;
+        $targetAmount = ($hasTarget && !empty($validated['target_amount']))
+            ? (float) $validated['target_amount']
+            : null;
+        $color = !empty($validated['color']) ? trim($validated['color']) : '#13ec80';
+        $icon = !empty($validated['icon']) ? trim($validated['icon']) : 'savings';
+        $description = !empty($validated['description']) ? trim($validated['description']) : null;
 
-        $goal = Goal::create([
-            'user_id' => $user->id,
-            'family_id' => $user->family_id,
-            'name' => $validated['name'],
-            'has_target' => $hasTarget,
-            'target_amount' => $hasTarget ? (float) $validated['target_amount'] : null,
-            'target_date' => $hasTarget ? ($validated['target_date'] ?? null) : null,
-            'current_balance' => $initialBalance,
-            'color' => $validated['color'] ?? '#13ec80',
-            'icon' => $validated['icon'] ?? 'savings',
-            'description' => $validated['description'] ?? null,
-            'latest_note' => $note,
-            'latest_note_at' => $note ? now() : null,
-            'status' => 'active',
-        ]);
+        try {
+            $goal = DB::transaction(function () use ($user, $validated, $hasTarget, $targetAmount, $targetDate, $initialBalance, $note, $color, $icon, $description) {
+                $goal = Goal::create([
+                    'user_id' => $user->id,
+                    'family_id' => $user->family_id,
+                    'name' => trim($validated['name']),
+                    'has_target' => $hasTarget,
+                    'target_amount' => $targetAmount,
+                    'target_date' => $targetDate,
+                    'current_balance' => $initialBalance,
+                    'color' => $color,
+                    'icon' => $icon,
+                    'description' => $description,
+                    'latest_note' => $note,
+                    'latest_note_at' => $note ? now() : null,
+                    'status' => 'active',
+                ]);
 
-        if ($initialBalance > 0) {
-            GoalTransaction::create([
-                'goal_id' => $goal->id,
+                if ($initialBalance > 0) {
+                    GoalTransaction::create([
+                        'goal_id' => $goal->id,
+                        'user_id' => $user->id,
+                        'type' => 'in',
+                        'amount' => $initialBalance,
+                        'balance_before' => 0,
+                        'balance_after' => $initialBalance,
+                        'notes' => $note ?? 'Initial Balance',
+                        'transaction_date' => now()->format('Y-m-d'),
+                    ]);
+                }
+
+                return $goal;
+            });
+
+            return redirect()->route('goals.index')
+                ->with('success', 'Pocket "' . $goal->name . '" created successfully!');
+        } catch (\Throwable $e) {
+            Log::error('Failed to create goal: ' . $e->getMessage(), [
                 'user_id' => $user->id,
-                'type' => 'in',
-                'amount' => $initialBalance,
-                'balance_before' => 0,
-                'balance_after' => $initialBalance,
-                'notes' => $note ?? 'Initial Balance',
-                'transaction_date' => now()->format('Y-m-d'),
+                'family_id' => $user->family_id,
+                'input' => $request->except(['_token']),
+                'trace' => $e->getTraceAsString(),
             ]);
-        }
 
-        return redirect()->route('goals.index')
-            ->with('success', 'Pocket "' . $goal->name . '" created successfully!');
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -155,20 +188,38 @@ class GoalController extends Controller
         ]);
 
         $hasTarget = filter_var($validated['has_target'], FILTER_VALIDATE_BOOLEAN);
+        $targetDate = ($hasTarget && !empty($validated['target_date']))
+            ? Carbon::parse($validated['target_date'])->format('Y-m-d')
+            : null;
+        $targetAmount = ($hasTarget && !empty($validated['target_amount']))
+            ? (float) $validated['target_amount']
+            : null;
 
-        $goal->update([
-            'name' => $validated['name'],
-            'has_target' => $hasTarget,
-            'target_amount' => $hasTarget ? (float) $validated['target_amount'] : null,
-            'target_date' => $hasTarget ? ($validated['target_date'] ?? null) : null,
-            'color' => $validated['color'] ?? $goal->color,
-            'icon' => $validated['icon'] ?? $goal->icon,
-            'description' => $validated['description'] ?? null,
-            'status' => $validated['status'],
-        ]);
+        try {
+            $goal->update([
+                'name' => trim($validated['name']),
+                'has_target' => $hasTarget,
+                'target_amount' => $targetAmount,
+                'target_date' => $targetDate,
+                'color' => !empty($validated['color']) ? trim($validated['color']) : $goal->color,
+                'icon' => !empty($validated['icon']) ? trim($validated['icon']) : $goal->icon,
+                'description' => !empty($validated['description']) ? trim($validated['description']) : null,
+                'status' => $validated['status'],
+            ]);
 
-        return redirect()->route('goals.show', $goal->id)
-            ->with('success', 'Pocket updated successfully!');
+            return redirect()->route('goals.show', $goal->id)
+                ->with('success', 'Pocket updated successfully!');
+        } catch (\Throwable $e) {
+            Log::error('Failed to update goal: ' . $e->getMessage(), [
+                'goal_id' => $id,
+                'user_id' => $user->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -186,28 +237,51 @@ class GoalController extends Controller
             'transaction_date' => 'nullable|date',
         ]);
 
-        $transaction = $this->balancingService->adjustBalance(
-            $goal,
-            (float) $validated['amount'],
-            $validated['type'],
-            $validated['notes'] ?? null,
-            $validated['transaction_date'] ?? null,
-            $user
-        );
+        try {
+            $transactionDate = !empty($validated['transaction_date'])
+                ? Carbon::parse($validated['transaction_date'])->format('Y-m-d')
+                : null;
 
-        $typeLabel = $validated['type'] === 'in' ? 'Deposit' : 'Withdrawal';
-        $message = $typeLabel . ' of Rp ' . number_format($transaction->amount, 0, ',', '.') . ' recorded successfully!';
+            $transaction = $this->balancingService->adjustBalance(
+                $goal,
+                (float) $validated['amount'],
+                $validated['type'],
+                !empty($validated['notes']) ? trim($validated['notes']) : null,
+                $transactionDate,
+                $user
+            );
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'goal' => $goal->fresh(),
-                'transaction' => $transaction,
+            $typeLabel = $validated['type'] === 'in' ? 'Deposit' : 'Withdrawal';
+            $message = $typeLabel . ' of Rp ' . number_format($transaction->amount, 0, ',', '.') . ' recorded successfully!';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'goal' => $goal->fresh(),
+                    'transaction' => $transaction,
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
+        } catch (\Throwable $e) {
+            Log::error('Failed to adjust goal balance: ' . $e->getMessage(), [
+                'goal_id' => $id,
+                'user_id' => $user->id,
+                'trace' => $e->getTraceAsString(),
             ]);
-        }
 
-        return redirect()->back()->with('success', $message);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to adjust balance: ' . $e->getMessage(),
+                ], 422);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -218,10 +292,19 @@ class GoalController extends Controller
         $user = Auth::user();
         $goal = Goal::forFamily($user->family_id)->findOrFail($id);
 
-        $goalName = $goal->name;
-        $goal->delete();
+        try {
+            $goalName = $goal->name;
+            $goal->delete();
 
-        return redirect()->route('goals.index')
-            ->with('success', 'Pocket "' . $goalName . '" deleted successfully.');
+            return redirect()->route('goals.index')
+                ->with('success', 'Pocket "' . $goalName . '" deleted successfully.');
+        } catch (\Throwable $e) {
+            Log::error('Failed to delete goal: ' . $e->getMessage(), [
+                'goal_id' => $id,
+                'user_id' => $user->id,
+            ]);
+
+            return redirect()->back()->withErrors(['error' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 }

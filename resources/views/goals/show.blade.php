@@ -111,6 +111,19 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-600 dark:text-rose-400 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-xl">error</span>
+                        <ul class="text-sm font-semibold list-disc pl-4 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
             <!-- Key Metrics Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 
