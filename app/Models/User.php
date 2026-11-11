@@ -23,6 +23,9 @@ class User extends Authenticatable
         'password',
         'family_id',
         'theme',
+        'telegram_chat_id',
+        'telegram_connect_token',
+        'telegram_connect_token_expires_at',
     ];
 
     public function family()
@@ -60,6 +63,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'telegram_connect_token_expires_at' => 'datetime',
         ];
     }
 }

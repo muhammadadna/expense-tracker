@@ -1,3 +1,5 @@
+name: expense-tracker
+
 services:
   app:
     image: webdevops/php-apache-dev:8.5-alpine

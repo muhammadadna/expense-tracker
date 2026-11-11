@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -49,6 +50,35 @@ class ProfileController extends Controller
         $request->user()->update($validated);
 
         return back()->with('status', 'theme-updated');
+    }
+
+    /**
+     * Generate a pairing token for connecting Telegram.
+     */
+    public function generateTelegramToken(Request $request): RedirectResponse
+    {
+        $token = 'EXP-' . strtoupper(Str::random(6));
+
+        $request->user()->update([
+            'telegram_connect_token' => $token,
+            'telegram_connect_token_expires_at' => now()->addMinutes(15),
+        ]);
+
+        return back()->with('status', 'telegram-token-generated');
+    }
+
+    /**
+     * Disconnect Telegram account.
+     */
+    public function disconnectTelegram(Request $request): RedirectResponse
+    {
+        $request->user()->update([
+            'telegram_chat_id' => null,
+            'telegram_connect_token' => null,
+            'telegram_connect_token_expires_at' => null,
+        ]);
+
+        return back()->with('status', 'telegram-disconnected');
     }
 
     /**
