@@ -95,29 +95,38 @@ class TelegramWebhookController extends Controller
 
         // Handle commands for connected users
         if (str_starts_with($text, '/')) {
-            $command = strtolower(explode(' ', $text)[0]);
+            $commandPart = explode(' ', $text)[0];
+            $command = strtolower(explode('@', $commandPart)[0]);
+
             switch ($command) {
                 case '/help':
                 case '/bantuan':
+                case '/panduan':
                     $this->sendHelpMessage($chatId);
                     return;
 
                 case '/kategori':
+                case '/kategory':
+                case '/category':
+                case '/categories':
                     $this->sendCategoriesListMessage($chatId);
                     return;
 
                 case '/rekap':
+                case '/summary':
+                case '/total':
                     $this->sendSummaryMessage($chatId, $user);
                     return;
 
                 case '/batal':
                 case '/undo':
+                case '/cancel':
                     $this->handleUndoLastTransaction($chatId, $user);
                     return;
 
                 default:
-                    // Unknown command, fall through to expense parsing
-                    break;
+                    $this->telegram->sendMessage($chatId, "⚠️ Perintah *{$command}* tidak dikenali.\n\nKetik /help untuk panduan atau /kategori untuk melihat daftar kategori.", null, 'Markdown');
+                    return;
             }
         }
 
@@ -178,7 +187,7 @@ class TelegramWebhookController extends Controller
             $formattedDate = $dateObj->locale('id')->isoFormat('dddd, D MMMM Y');
             $customDateTag = ($data['is_custom_date'] ?? false) ? ' *(Tanggal Khusus)*' : '';
             $rupiah = TelegramExpenseParser::formatRupiah($data['amount']);
-            $catIcon = $category->icon ?? '🏷️';
+            $catIcon = self::getCategoryEmoji($category->icon ?? null, $category->name);
 
             $msg = "✅ *Transaksi Berhasil Dicatat!*\n\n";
             $msg .= "🏷️ *Kategori* : {$catIcon} {$category->name}\n";
@@ -414,13 +423,49 @@ class TelegramWebhookController extends Controller
 
         $msg = "🏷️ *Daftar Kategori Pengeluaran*\n\n";
         foreach ($categories as $cat) {
-            $icon = $cat->icon ?? '•';
-            $msg .= "{$icon} *{$cat->name}*\n";
+            $emoji = self::getCategoryEmoji($cat->icon, $cat->name);
+            $msg .= "{$emoji} *{$cat->name}*\n";
         }
 
-        $msg .= "\n💡 _Ketik pengeluaran dengan menyebutkan nama kategori atau kata yang relevan, contoh:_ `makan 25k` _atau_ `bensin 50rb`";
+        $msg .= "\n💡 _Ketik pengeluaran dengan menyebutkan nama kategori atau kata yang relevan, contoh:_\n";
+        $msg .= "• `makan 25k soto ayam`\n";
+        $msg .= "• `bensin 50rb pertamax`\n";
+        $msg .= "• `kemarin belanja 150k beras`\n";
 
         $this->telegram->sendMessage($chatId, $msg, null, 'Markdown');
+    }
+
+    /**
+     * Map database icon string or name to a nice Telegram emoji.
+     */
+    public static function getCategoryEmoji(?string $icon, string $name = ''): string
+    {
+        $map = [
+            'cake' => '🍔',
+            'truck' => '⛽',
+            'shopping-cart' => '🛒',
+            'bolt' => '💡',
+            'film' => '🎬',
+            'globe-alt' => '🌐',
+            'heart' => '🏥',
+            'book-open' => '📚',
+        ];
+
+        if ($icon && isset($map[$icon])) {
+            return $map[$icon];
+        }
+
+        $nameLower = strtolower($name);
+        if (str_contains($nameLower, 'food') || str_contains($nameLower, 'makan')) return '🍔';
+        if (str_contains($nameLower, 'transport') || str_contains($nameLower, 'bensin')) return '⛽';
+        if (str_contains($nameLower, 'grocer') || str_contains($nameLower, 'belanja')) return '🛒';
+        if (str_contains($nameLower, 'utilit') || str_contains($nameLower, 'listrik')) return '💡';
+        if (str_contains($nameLower, 'entertain') || str_contains($nameLower, 'hiburan')) return '🎬';
+        if (str_contains($nameLower, 'health') || str_contains($nameLower, 'sehat') || str_contains($nameLower, 'obat')) return '🏥';
+        if (str_contains($nameLower, 'educat') || str_contains($nameLower, 'didik') || str_contains($nameLower, 'buku')) return '📚';
+        if (str_contains($nameLower, 'online')) return '🌐';
+
+        return '🏷️';
     }
 
     /**

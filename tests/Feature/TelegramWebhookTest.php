@@ -156,4 +156,44 @@ class TelegramWebhookTest extends TestCase
         $this->assertDatabaseMissing('transactions', ['id' => $tx->id]);
         Event::assertDispatched(TransactionDeleted::class);
     }
+
+    public function test_paired_user_can_view_categories_list_via_kategori_and_kategory(): void
+    {
+        $family = Family::create(['name' => 'Keluarga', 'family_code' => 'FAM123']);
+        $user = User::factory()->create([
+            'family_id' => $family->id,
+            'telegram_chat_id' => '123456',
+        ]);
+        Category::create(['name' => 'Food', 'icon' => 'cake']);
+        Category::create(['name' => 'Transport', 'icon' => 'truck']);
+
+        $this->mock(TelegramService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendMessage')
+                ->twice()
+                ->withArgs(function ($chatId, $msg, $replyMarkup = null, $parseMode = null) {
+                    return $chatId == 123456 && str_contains($msg, 'Daftar Kategori Pengeluaran') && str_contains($msg, 'Food');
+                })
+                ->andReturn(['ok' => true]);
+        });
+
+        // Test with Indonesian spelling
+        $res1 = $this->postJson(route('telegram.webhook'), [
+            'update_id' => 1005,
+            'message' => [
+                'chat' => ['id' => 123456],
+                'text' => '/kategori',
+            ],
+        ]);
+        $res1->assertOk();
+
+        // Test with alternative spelling with 'y' (/kategory)
+        $res2 = $this->postJson(route('telegram.webhook'), [
+            'update_id' => 1006,
+            'message' => [
+                'chat' => ['id' => 123456],
+                'text' => '/kategory',
+            ],
+        ]);
+        $res2->assertOk();
+    }
 }

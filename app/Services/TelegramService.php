@@ -41,7 +41,17 @@ class TelegramService
 
         try {
             $response = Http::timeout(10)->post("{$this->baseUrl}/sendMessage", $payload);
-            return $response->json() ?? ['ok' => false];
+            $result = $response->json() ?? ['ok' => false];
+
+            // If Telegram rejected message due to parse_mode formatting errors, retry without parse_mode
+            if (!($result['ok'] ?? false) && $parseMode) {
+                Log::warning("Telegram sendMessage failed with parse_mode {$parseMode}: " . json_encode($result) . ". Retrying without parse_mode.");
+                unset($payload['parse_mode']);
+                $retryResponse = Http::timeout(10)->post("{$this->baseUrl}/sendMessage", $payload);
+                return $retryResponse->json() ?? ['ok' => false];
+            }
+
+            return $result;
         } catch (\Throwable $e) {
             Log::error('TelegramService sendMessage error: ' . $e->getMessage());
             return ['ok' => false, 'error' => $e->getMessage()];
